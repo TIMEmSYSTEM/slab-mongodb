@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TIMEmSYSTEM.SemanticLogging.MongoDB")]
+[assembly: AssemblyTitle("TIMEmSYSTEM.SemanticLogging.Mongo")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TIMEmSYSTEM ApS")]
-[assembly: AssemblyProduct("TIMEmSYSTEM.SemanticLogging.MongoDB")]
+[assembly: AssemblyProduct("TIMEmSYSTEM.SemanticLogging.Mongo")]
 [assembly: AssemblyCopyright("Copyright © TIMEmSYSTEM  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

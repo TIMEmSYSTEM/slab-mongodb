@@ -7,8 +7,8 @@
     <ProjectGuid>{9DBA45E5-DA75-4FD5-8FA0-DE4DC03FF6AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TIMEmSYSTEM.SemanticLogging.MongoDB.Tests</RootNamespace>
-    <AssemblyName>TIMEmSYSTEM.SemanticLogging.MongoDB.Tests</AssemblyName>
+    <RootNamespace>TIMEmSYSTEM.SemanticLogging.Mongo.Tests</RootNamespace>
+    <AssemblyName>TIMEmSYSTEM.SemanticLogging.Mongo.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -70,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HumongousSinkBufferingIntervalTests.cs" />
-    <Compile Include="HumongousSinkTestsSetUp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestEventSource.cs" />
   </ItemGroup>
@@ -78,9 +77,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TIMEmSYSTEM.SemanticLogging.MongoDB\TIMEmSYSTEM.SemanticLogging.MongoDB.csproj">
+    <ProjectReference Include="..\TIMEmSYSTEM.SemanticLogging.Mongo\TIMEmSYSTEM.SemanticLogging.Mongo.csproj">
       <Project>{eb898919-8af9-45ec-9620-4b025d65bcd6}</Project>
-      <Name>TIMEmSYSTEM.SemanticLogging.MongoDB</Name>
+      <Name>TIMEmSYSTEM.SemanticLogging.Mongo</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

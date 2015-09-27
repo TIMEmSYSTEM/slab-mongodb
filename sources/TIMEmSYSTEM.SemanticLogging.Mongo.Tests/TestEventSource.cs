@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TIMEmSYSTEM.SemanticLogging.MongoDB.Tests
-{
-    using System;
-    using System.Diagnostics.Tracing;
+using System;
+using System.Diagnostics.Tracing;
 
+namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
+{
     /// <summary>
     ///     Test event source.
     /// </summary>
@@ -47,9 +47,9 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB.Tests
         [Event(1)]
         public void TestEvent()
         {
-            if (this.IsEnabled())
+            if (IsEnabled())
             {
-                this.WriteEvent(1);
+                WriteEvent(1);
             }
         }
     }

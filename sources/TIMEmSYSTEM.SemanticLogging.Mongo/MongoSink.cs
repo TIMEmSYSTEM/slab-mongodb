@@ -1,52 +1,51 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HumongousSink.cs" company="">
-//   
+// <copyright file="MongoSink.cs" company="TIMEmSYSTEM ApS">
+//   © TIMEmSYSTEM 2015
 // </copyright>
 // <summary>
 //   The humongous sink.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TIMEmSYSTEM.SemanticLogging.MongoDB
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using MongoDB.Driver;
+
+namespace TIMEmSYSTEM.SemanticLogging.Mongo
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using global::MongoDB.Driver;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-
     /// <summary>
     /// The humongous sink.
     /// </summary>
-    public class HumongousSink : IObserver<EventEntry>, IDisposable
+    public class MongoSink : IObserver<EventEntry>, IDisposable
     {
         /// <summary>
         /// The _buffered publisher.
         /// </summary>
-        private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
+        private readonly BufferedEventPublisher<EventEntry> _bufferedPublisher;
 
         /// <summary>
         /// The _cancellation token source.
         /// </summary>
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// The _on completed timeout.
         /// </summary>
-        private readonly TimeSpan onCompletedTimeout;
+        private readonly TimeSpan _onCompletedTimeout;
 
         /// <summary>
         /// The collection.
         /// </summary>
-        private readonly IMongoCollection<EventEntry> collection;
+        private readonly IMongoCollection<EventEntry> _collection;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HumongousSink"/> class.
+        /// Initializes a new instance of the <see cref="MongoSink"/> class.
         /// </summary>
         /// <param name="connectionString">
         /// The connection string.
@@ -69,7 +68,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// <param name="onCompletedTimeout">
         /// The on completed timeout.
         /// </param>
-        public HumongousSink(
+        public MongoSink(
             string connectionString, 
             string instanceName, 
             string collectionName, 
@@ -89,7 +88,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HumongousSink"/> class.
+        /// Initializes a new instance of the <see cref="MongoSink"/> class.
         /// </summary>
         /// <param name="client">
         /// The client.
@@ -112,7 +111,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// <param name="onCompletedTimeout">
         /// The on completed timeout.
         /// </param>
-        public HumongousSink(
+        public MongoSink(
             IMongoClient client, 
             string instanceName, 
             string collectionName, 
@@ -121,23 +120,23 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
             int maxBufferSize, 
             TimeSpan onCompletedTimeout)
         {
-            this.onCompletedTimeout = onCompletedTimeout;
-            this.bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(
+            _onCompletedTimeout = onCompletedTimeout;
+            _bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(
                 "mongodb", 
-                this.PublishEventsAsync, 
+                PublishEventsAsync, 
                 bufferingInterval, 
                 bufferingCount, 
                 maxBufferSize, 
-                this.cancellationTokenSource.Token);
-            this.collection = client.GetDatabase(instanceName).GetCollection<EventEntry>(collectionName);
+                _cancellationTokenSource.Token);
+            _collection = client.GetDatabase(instanceName).GetCollection<EventEntry>(collectionName);
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="HumongousSink"/> class. 
+        /// Finalizes an instance of the <see cref="MongoSink"/> class. 
         /// </summary>
-        ~HumongousSink()
+        ~MongoSink()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <summary>
@@ -145,7 +144,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -154,8 +153,8 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// </summary>
         public void OnCompleted()
         {
-            this.FlushSafe();
-            this.Dispose();
+            FlushSafe();
+            Dispose();
         }
 
         /// <summary>
@@ -166,8 +165,8 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// </param>
         public void OnError(Exception error)
         {
-            this.FlushSafe();
-            this.Dispose();
+            FlushSafe();
+            Dispose();
         }
 
         /// <summary>
@@ -178,7 +177,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// </param>
         public void OnNext(EventEntry value)
         {
-            this.bufferedPublisher.TryPost(value);
+            _bufferedPublisher.TryPost(value);
         }
 
         /// <summary>
@@ -193,8 +192,8 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         {
             if (disposing)
             {
-                this.cancellationTokenSource.Cancel();
-                this.bufferedPublisher.Dispose();
+                _cancellationTokenSource.Cancel();
+                _bufferedPublisher.Dispose();
             }
         }
 
@@ -206,7 +205,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         /// </returns>
         private Task FlushAsync()
         {
-            return this.bufferedPublisher.FlushAsync();
+            return _bufferedPublisher.FlushAsync();
         }
 
         /// <summary>
@@ -216,7 +215,7 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         {
             try
             {
-                this.FlushAsync().Wait(this.onCompletedTimeout);
+                FlushAsync().Wait(_onCompletedTimeout);
             }
             catch (AggregateException ex)
             {
@@ -237,11 +236,11 @@ namespace TIMEmSYSTEM.SemanticLogging.MongoDB
         {
             if (eventEntries.Count == 1)
             {
-                await this.collection.InsertOneAsync(eventEntries[0]).ConfigureAwait(false);
+                await _collection.InsertOneAsync(eventEntries[0]).ConfigureAwait(false);
             }
             else
             {
-                await this.collection.InsertManyAsync(eventEntries).ConfigureAwait(false);
+                await _collection.InsertManyAsync(eventEntries).ConfigureAwait(false);
             }
 
             return eventEntries.Count;

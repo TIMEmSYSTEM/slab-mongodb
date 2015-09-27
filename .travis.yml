@@ -1,8 +1,4 @@
 language: csharp
-solution: TIMEmSYSTEM.SemanticLogging.MongoDB.sln
-install:
-  - nuget restore TIMEmSYSTEM.SemanticLogging.MongoDB.sln
-  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory packages
+solution: TIMEmSYSTEM.SemanticLogging.Mongo.sln
 script:
-  - xbuild /p:Configuration=Release TIMEmSYSTEM.SemanticLogging.MongoDB.sln
-  - mono ./packages/NUnit.Runners.2.6.4/tools/nunit-console.exe ./sources/TIMEmSYSTEM.SemanticLogging.MongoDB.Tests/bin/Release/TIMEmSYSTEM.SemanticLogging.MongoDB.Tests.dll
+  - xbuild /p:Configuration=Release ./sources/TIMEmSYSTEM.SemanticLogging.Mongo/TIMEmSYSTEM.SemanticLogging.Mongo.csproj

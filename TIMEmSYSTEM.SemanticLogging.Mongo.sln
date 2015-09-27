@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMEmSYSTEM.SemanticLogging.MongoDB", "sources\TIMEmSYSTEM.SemanticLogging.MongoDB\TIMEmSYSTEM.SemanticLogging.MongoDB.csproj", "{EB898919-8AF9-45EC-9620-4B025D65BCD6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMEmSYSTEM.SemanticLogging.Mongo", "sources\TIMEmSYSTEM.SemanticLogging.Mongo\TIMEmSYSTEM.SemanticLogging.Mongo.csproj", "{EB898919-8AF9-45EC-9620-4B025D65BCD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMEmSYSTEM.SemanticLogging.MongoDB.Tests", "sources\TIMEmSYSTEM.SemanticLogging.MongoDB.Tests\TIMEmSYSTEM.SemanticLogging.MongoDB.Tests.csproj", "{9DBA45E5-DA75-4FD5-8FA0-DE4DC03FF6AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIMEmSYSTEM.SemanticLogging.Mongo.Tests", "sources\TIMEmSYSTEM.SemanticLogging.Mongo.Tests\TIMEmSYSTEM.SemanticLogging.Mongo.Tests.csproj", "{9DBA45E5-DA75-4FD5-8FA0-DE4DC03FF6AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
