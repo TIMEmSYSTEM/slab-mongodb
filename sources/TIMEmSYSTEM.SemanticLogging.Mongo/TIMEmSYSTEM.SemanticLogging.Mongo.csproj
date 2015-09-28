@@ -7,8 +7,8 @@
     <ProjectGuid>{EB898919-8AF9-45EC-9620-4B025D65BCD6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TIMEmSYSTEM.SemanticLogging.MongoDB</RootNamespace>
-    <AssemblyName>TIMEmSYSTEM.SemanticLogging.MongoDB</AssemblyName>
+    <RootNamespace>TIMEmSYSTEM.SemanticLogging.Mongo</RootNamespace>
+    <AssemblyName>TIMEmSYSTEM.SemanticLogging.Mongo</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -61,7 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HumongousSink.cs" />
+    <Compile Include="MongoSink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

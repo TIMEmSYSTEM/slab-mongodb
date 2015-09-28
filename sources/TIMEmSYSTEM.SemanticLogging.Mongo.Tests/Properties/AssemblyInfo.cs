@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TIMEmSYSTEM.SemanticLogging.MongoDB")]
+[assembly: AssemblyTitle("TIMEmSYSTEM.SemanticLogging.Mongo.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TIMEmSYSTEM ApS")]
-[assembly: AssemblyProduct("TIMEmSYSTEM.SemanticLogging.MongoDB")]
+[assembly: AssemblyCompany("TIMEmSYSTEM  ApS")]
+[assembly: AssemblyProduct("TIMEmSYSTEM.SemanticLogging.Mongo.Tests")]
 [assembly: AssemblyCopyright("Copyright © TIMEmSYSTEM  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("eb898919-8af9-45ec-9620-4b025d65bcd6")]
+[assembly: Guid("9dba45e5-da75-4fd5-8fa0-de4dc03ff6ab")]
 
 // Version information for an assembly consists of the following four values:
 //

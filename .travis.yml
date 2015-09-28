@@ -1,2 +1,4 @@
 language: csharp
-solution: TIMEmSYSTEM.SemanticLogging.MongoDB.sln
+solution: TIMEmSYSTEM.SemanticLogging.Mongo.sln
+script:
+  - xbuild /p:Configuration=Release ./sources/TIMEmSYSTEM.SemanticLogging.Mongo/TIMEmSYSTEM.SemanticLogging.Mongo.csproj
