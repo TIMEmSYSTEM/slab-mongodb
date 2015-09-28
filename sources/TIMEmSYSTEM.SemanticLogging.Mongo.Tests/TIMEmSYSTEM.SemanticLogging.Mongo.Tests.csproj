@@ -69,7 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HumongousSinkBufferingIntervalTests.cs" />
+    <Compile Include="MongoSinkBufferingIntervalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestEventSource.cs" />
   </ItemGroup>

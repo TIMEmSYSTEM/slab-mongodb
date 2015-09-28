@@ -16,7 +16,6 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using MongoDB.Driver;
 using Moq;
 using NUnit.Framework;
-using TIMEmSYSTEM.SemanticLogging.MongoDB.Tests;
 
 namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
 {
@@ -27,24 +26,60 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
     public class MongoSinkBufferingIntervalTests
     {
         /// <summary>
+        ///     The set up.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _clientMock.Setup(x => x.GetDatabase(InstanceName, null)).Returns(() => _databaseMock.Object);
+            _databaseMock.Setup(x => x.GetCollection<EventEntry>(CollectionName, null))
+                .Returns(() => _collectionMock.Object);
+
+            _sink = new MongoSink(
+                _clientMock.Object,
+                InstanceName,
+                CollectionName,
+                _bufferingInterval,
+                int.MaxValue,
+                int.MaxValue,
+                TimeSpan.Zero);
+
+            _eventListener = new ObservableEventListener();
+            _eventListener.EnableEvents(TestEventSource.EventSource, EventLevel.LogAlways);
+            _subscription = _eventListener.Subscribe(_sink);
+        }
+
+        /// <summary>
+        ///     The tear down.
+        /// </summary>
+        [TearDown]
+        public void TearDown()
+        {
+            _eventListener.DisableEvents(TestEventSource.EventSource);
+            _eventListener.Dispose();
+            _subscription.Dispose();
+            _collectionMock.Reset();
+        }
+
+        /// <summary>
         ///     The mongo client.
         /// </summary>
-        private readonly Mock<IMongoClient> _client = new Mock<IMongoClient>();
+        private readonly Mock<IMongoClient> _clientMock = new Mock<IMongoClient>();
 
         /// <summary>
         ///     The mongo database.
         /// </summary>
-        private readonly Mock<IMongoDatabase> _database = new Mock<IMongoDatabase>();
+        private readonly Mock<IMongoDatabase> _databaseMock = new Mock<IMongoDatabase>();
 
         /// <summary>
         ///     The mongo collection.
         /// </summary>
-        private readonly Mock<IMongoCollection<EventEntry>> _collection = new Mock<IMongoCollection<EventEntry>>();
+        private readonly Mock<IMongoCollection<EventEntry>> _collectionMock = new Mock<IMongoCollection<EventEntry>>();
 
         /// <summary>
         ///     The buffering interval.
         /// </summary>
-        private readonly TimeSpan _bufferingInterval = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan _bufferingInterval = TimeSpan.FromMilliseconds(1);
 
         /// <summary>
         ///     The sink.
@@ -52,77 +87,102 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
         private IObserver<EventEntry> _sink;
 
         /// <summary>
-        /// The event listener.
+        ///     The event listener.
         /// </summary>
         private ObservableEventListener _eventListener;
 
         /// <summary>
-        /// The instance name
+        ///     The instance name
         /// </summary>
         public const string InstanceName = "slab";
 
         /// <summary>
-        /// The collection name
+        ///     The collection name
         /// </summary>
         public const string CollectionName = "events";
 
         /// <summary>
-        ///     The set up.
+        ///     The subscription.
         /// </summary>
-        [TestFixtureSetUp]
-        public void SetUp()
+        private IDisposable _subscription;
+
+        [Test]
+        public void WhenNoEventsShouldNeverCallInsertMany()
         {
-            _client.Setup(x => x.GetDatabase(InstanceName, null)).Returns(() => _database.Object);
-            _database.Setup(x => x.GetCollection<EventEntry>(CollectionName, null)).Returns(() => _collection.Object);
-            _sink = new MongoSink(
-                _client.Object,
-                InstanceName,
-                CollectionName, 
-                _bufferingInterval, 
-                byte.MaxValue, 
-                int.MaxValue, 
-                TimeSpan.Zero);
-            _eventListener = new ObservableEventListener();
-            _eventListener.EnableEvents(TestEventSource.EventSource, EventLevel.LogAlways);
-            _eventListener.Subscribe(_sink);
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x =>
+                    x.InsertManyAsync(
+                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        CancellationToken.None), Times.Never);
         }
 
         /// <summary>
-        /// Test should insert one event into collection.
+        ///     Test should not insert events into collection when event list is empty.
         /// </summary>
         [Test]
-        public void ShouldInsertOneEventIntoCollection()
+        public void WhenNoEventsShouldNeverCallInsertOne()
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                Times.Never);
+        }
+
+        /// <summary>
+        ///     Test should insert one event into collection.
+        /// </summary>
+        [Test]
+        public void WhenOneEventShouldCallInsertOneOnce()
         {
             TestEventSource.EventSource.TestEvent();
-            Thread.Sleep(_bufferingInterval.Add(TimeSpan.FromMilliseconds(1)));
-            _collection.Verify(x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None), Times.Once);
-            _collection.Verify(x => x.InsertManyAsync(It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null, CancellationToken.None), Times.Never);
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                Times.Once);
         }
-        
-        /// <summary>
-        /// Test should insert several events into collection.
-        /// </summary>
+
         [Test]
-        public void ShouldInsertSeveralEventsIntoCollection()
+        public void WhenOneEventShouldNeverCallInsertMany()
+        {
+            TestEventSource.EventSource.TestEvent();
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x =>
+                    x.InsertManyAsync(
+                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        CancellationToken.None), Times.Never);
+        }
+
+        [Test]
+        public void WhenSeveralEventsShouldCallInsertMany()
         {
             for (byte i = 0; i < byte.MaxValue; i++)
             {
                 TestEventSource.EventSource.TestEvent();
             }
-
-            Thread.Sleep(_bufferingInterval.Add(TimeSpan.FromMilliseconds(1)));
-            _collection.Verify(x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None), Times.AtMostOnce);
-            _collection.Verify(x => x.InsertManyAsync(It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null, CancellationToken.None), Times.AtLeastOnce);
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x =>
+                    x.InsertManyAsync(
+                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        CancellationToken.None), Times.Once);
         }
 
         /// <summary>
-        /// The tear down.
+        ///     Test should insert several events into collection.
         /// </summary>
-        [TestFixtureTearDown]
-        public void TearDown()
+        [Test]
+        public void WhenSeveralEventsShouldNotCallInsertOne()
         {
-            _eventListener.DisableEvents(TestEventSource.EventSource);
-            _eventListener.Dispose();
+            for (byte i = 0; i < byte.MaxValue; i++)
+            {
+                TestEventSource.EventSource.TestEvent();
+            }
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            _collectionMock.Verify(
+                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                Times.Never);
         }
     }
 }

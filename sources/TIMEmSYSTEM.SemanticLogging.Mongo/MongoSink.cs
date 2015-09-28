@@ -3,7 +3,7 @@
 //   © TIMEmSYSTEM 2015
 // </copyright>
 // <summary>
-//   The humongous sink.
+//   The mongo sink.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -20,127 +20,119 @@ using MongoDB.Driver;
 namespace TIMEmSYSTEM.SemanticLogging.Mongo
 {
     /// <summary>
-    /// The humongous sink.
+    ///     The mongo sink.
     /// </summary>
     public class MongoSink : IObserver<EventEntry>, IDisposable
     {
         /// <summary>
-        /// The _buffered publisher.
+        ///     The _buffered publisher.
         /// </summary>
         private readonly BufferedEventPublisher<EventEntry> _bufferedPublisher;
 
         /// <summary>
-        /// The _cancellation token source.
+        ///     The _cancellation token source.
         /// </summary>
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
-        /// The _on completed timeout.
-        /// </summary>
-        private readonly TimeSpan _onCompletedTimeout;
-
-        /// <summary>
-        /// The collection.
+        ///     The collection.
         /// </summary>
         private readonly IMongoCollection<EventEntry> _collection;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MongoSink"/> class.
+        ///     The _on completed timeout.
+        /// </summary>
+        private readonly TimeSpan _onCompletedTimeout;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MongoSink" /> class.
         /// </summary>
         /// <param name="connectionString">
-        /// The connection string.
+        ///     The connection string.
         /// </param>
         /// <param name="instanceName">
-        /// The instance name.
+        ///     The instance name.
         /// </param>
         /// <param name="collectionName">
-        /// The collection name.
+        ///     The collection name.
         /// </param>
         /// <param name="bufferingInterval">
-        /// The buffering interval.
+        ///     The buffering interval.
         /// </param>
         /// <param name="bufferingCount">
-        /// The buffering count.
+        ///     The buffering count.
         /// </param>
         /// <param name="maxBufferSize">
-        /// The max buffer size.
+        ///     The max buffer size.
         /// </param>
         /// <param name="onCompletedTimeout">
-        /// The on completed timeout.
+        ///     The on completed timeout.
         /// </param>
         public MongoSink(
-            string connectionString, 
-            string instanceName, 
-            string collectionName, 
-            TimeSpan bufferingInterval, 
-            int bufferingCount, 
-            int maxBufferSize, 
+            string connectionString,
+            string instanceName,
+            string collectionName,
+            TimeSpan bufferingInterval,
+            int bufferingCount,
+            int maxBufferSize,
             TimeSpan onCompletedTimeout)
             : this(
-                new MongoClient(connectionString), 
-                instanceName, 
-                collectionName, 
-                bufferingInterval, 
-                bufferingCount, 
-                maxBufferSize, 
+                new MongoClient(connectionString),
+                instanceName,
+                collectionName,
+                bufferingInterval,
+                bufferingCount,
+                maxBufferSize,
                 onCompletedTimeout)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MongoSink"/> class.
+        ///     Initializes a new instance of the <see cref="MongoSink" /> class.
         /// </summary>
         /// <param name="client">
-        /// The client.
+        ///     The client.
         /// </param>
         /// <param name="instanceName">
-        /// The instance name.
+        ///     The instance name.
         /// </param>
         /// <param name="collectionName">
-        /// The collection name.
+        ///     The collection name.
         /// </param>
         /// <param name="bufferingInterval">
-        /// The buffering interval.
+        ///     The buffering interval.
         /// </param>
         /// <param name="bufferingCount">
-        /// The buffering count.
+        ///     The buffering count.
         /// </param>
         /// <param name="maxBufferSize">
-        /// The max buffer size.
+        ///     The max buffer size.
         /// </param>
         /// <param name="onCompletedTimeout">
-        /// The on completed timeout.
+        ///     The on completed timeout.
         /// </param>
         public MongoSink(
-            IMongoClient client, 
-            string instanceName, 
-            string collectionName, 
-            TimeSpan bufferingInterval, 
-            int bufferingCount, 
-            int maxBufferSize, 
+            IMongoClient client,
+            string instanceName,
+            string collectionName,
+            TimeSpan bufferingInterval,
+            int bufferingCount,
+            int maxBufferSize,
             TimeSpan onCompletedTimeout)
         {
             _onCompletedTimeout = onCompletedTimeout;
             _bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(
-                "mongodb", 
-                PublishEventsAsync, 
-                bufferingInterval, 
-                bufferingCount, 
-                maxBufferSize, 
+                "mongodb",
+                PublishEventsAsync,
+                bufferingInterval,
+                bufferingCount,
+                maxBufferSize,
                 _cancellationTokenSource.Token);
             _collection = client.GetDatabase(instanceName).GetCollection<EventEntry>(collectionName);
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="MongoSink"/> class. 
-        /// </summary>
-        ~MongoSink()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// The dispose.
+        ///     The dispose.
         /// </summary>
         public void Dispose()
         {
@@ -149,7 +141,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The on completed.
+        ///     The on completed.
         /// </summary>
         public void OnCompleted()
         {
@@ -158,10 +150,10 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The on error.
+        ///     The on error.
         /// </summary>
         /// <param name="error">
-        /// The error.
+        ///     The error.
         /// </param>
         public void OnError(Exception error)
         {
@@ -170,10 +162,10 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The on next.
+        ///     The on next.
         /// </summary>
         /// <param name="value">
-        /// The value.
+        ///     The value.
         /// </param>
         public void OnNext(EventEntry value)
         {
@@ -181,12 +173,20 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The dispose.
+        ///     Finalizes an instance of the <see cref="MongoSink" /> class.
+        /// </summary>
+        ~MongoSink()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        ///     The dispose.
         /// </summary>
         /// <param name="disposing">
-        /// The disposing.
+        ///     The disposing.
         /// </param>
-        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed",
             MessageId = "cancellationTokenSource", Justification = "Token is cancelled")]
         protected virtual void Dispose(bool disposing)
         {
@@ -198,10 +198,10 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The flush async.
+        ///     The flush async.
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         private Task FlushAsync()
         {
@@ -209,7 +209,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The flush safe.
+        ///     The flush safe.
         /// </summary>
         private void FlushSafe()
         {
@@ -224,13 +224,13 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         }
 
         /// <summary>
-        /// The publish events async.
+        ///     The publish events async.
         /// </summary>
         /// <param name="eventEntries">
-        /// The event entries.
+        ///     The event entries.
         /// </param>
         /// <returns>
-        /// The <see cref="Task"/>.
+        ///     The <see cref="Task" />.
         /// </returns>
         private async Task<int> PublishEventsAsync(IList<EventEntry> eventEntries)
         {
@@ -238,7 +238,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
             {
                 await _collection.InsertOneAsync(eventEntries[0]).ConfigureAwait(false);
             }
-            else
+            else if (eventEntries.Count > 1)
             {
                 await _collection.InsertManyAsync(eventEntries).ConfigureAwait(false);
             }
