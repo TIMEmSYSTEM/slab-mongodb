@@ -21,8 +21,6 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
                 {"process", eventEntry.ProcessId},
                 {"thread", eventEntry.ThreadId},
                 {"level", (int) eventEntry.Schema.Level},
-                {"task", (int) eventEntry.Schema.Task},
-                {"ocode", (int) eventEntry.Schema.Opcode},
                 {"keywords", (long) eventEntry.Schema.Keywords},
                 {"payload", new BsonDocument(payload)}
             };
