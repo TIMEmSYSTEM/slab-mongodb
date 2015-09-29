@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventEntryExtensions.cs" />
     <Compile Include="MongoSink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

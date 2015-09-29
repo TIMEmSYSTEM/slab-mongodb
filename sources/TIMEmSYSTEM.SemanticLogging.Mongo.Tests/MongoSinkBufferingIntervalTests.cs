@@ -13,6 +13,7 @@ using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
 using NUnit.Framework;
@@ -32,7 +33,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
         public void SetUp()
         {
             _clientMock.Setup(x => x.GetDatabase(InstanceName, null)).Returns(() => _databaseMock.Object);
-            _databaseMock.Setup(x => x.GetCollection<EventEntry>(CollectionName, null))
+            _databaseMock.Setup(x => x.GetCollection<BsonDocument>(CollectionName, null))
                 .Returns(() => _collectionMock.Object);
 
             _sink = new MongoSink(
@@ -74,7 +75,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
         /// <summary>
         ///     The mongo collection.
         /// </summary>
-        private readonly Mock<IMongoCollection<EventEntry>> _collectionMock = new Mock<IMongoCollection<EventEntry>>();
+        private readonly Mock<IMongoCollection<BsonDocument>> _collectionMock = new Mock<IMongoCollection<BsonDocument>>();
 
         /// <summary>
         ///     The buffering interval.
@@ -113,7 +114,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
             _collectionMock.Verify(
                 x =>
                     x.InsertManyAsync(
-                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        It.Is<IEnumerable<BsonDocument>>(events => events.All(@event => @event["event"] == 1)), null,
                         CancellationToken.None), Times.Never);
         }
 
@@ -125,7 +126,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
         {
             Thread.Sleep(TimeSpan.FromSeconds(1));
             _collectionMock.Verify(
-                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                x => x.InsertOneAsync(It.Is<BsonDocument>(@event => @event["event"] == 1), CancellationToken.None),
                 Times.Never);
         }
 
@@ -138,7 +139,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
             TestEventSource.EventSource.TestEvent();
             Thread.Sleep(TimeSpan.FromSeconds(1));
             _collectionMock.Verify(
-                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                x => x.InsertOneAsync(It.Is<BsonDocument>(@event => @event["event"] == 1), CancellationToken.None),
                 Times.Once);
         }
 
@@ -150,7 +151,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
             _collectionMock.Verify(
                 x =>
                     x.InsertManyAsync(
-                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        It.Is<IEnumerable<BsonDocument>>(events => events.All(@event => @event["event"] == 1)), null,
                         CancellationToken.None), Times.Never);
         }
 
@@ -165,7 +166,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
             _collectionMock.Verify(
                 x =>
                     x.InsertManyAsync(
-                        It.Is<IEnumerable<EventEntry>>(events => events.All(@event => @event.EventId == 1)), null,
+                        It.Is<IEnumerable<BsonDocument>>(events => events.All(@event => @event["event"] == 1)), null,
                         CancellationToken.None), Times.Once);
         }
 
@@ -181,7 +182,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
             }
             Thread.Sleep(TimeSpan.FromSeconds(1));
             _collectionMock.Verify(
-                x => x.InsertOneAsync(It.Is<EventEntry>(@event => @event.EventId == 1), CancellationToken.None),
+                x => x.InsertOneAsync(It.Is<BsonDocument>(@event => @event["event"] == 1), CancellationToken.None),
                 Times.Never);
         }
     }
