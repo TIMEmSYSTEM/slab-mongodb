@@ -52,5 +52,14 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo.Tests
                 WriteEvent(1);
             }
         }
+
+        [Event(2)]
+        public void TestPayloadEvent(string payload)
+        {
+            if (IsEnabled())
+            {
+                WriteEvent(2, payload);
+            }
+        }
     }
 }

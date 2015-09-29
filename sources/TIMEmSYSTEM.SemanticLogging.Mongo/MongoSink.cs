@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace TIMEmSYSTEM.SemanticLogging.Mongo
@@ -37,7 +38,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         /// <summary>
         ///     The collection.
         /// </summary>
-        private readonly IMongoCollection<EventEntry> _collection;
+        private readonly IMongoCollection<BsonDocument> _collection;
 
         /// <summary>
         ///     The _on completed timeout.
@@ -128,7 +129,7 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
                 bufferingCount,
                 maxBufferSize,
                 _cancellationTokenSource.Token);
-            _collection = client.GetDatabase(instanceName).GetCollection<EventEntry>(collectionName);
+            _collection = client.GetDatabase(instanceName).GetCollection<BsonDocument>(collectionName);
         }
 
         /// <summary>
@@ -236,11 +237,11 @@ namespace TIMEmSYSTEM.SemanticLogging.Mongo
         {
             if (eventEntries.Count == 1)
             {
-                await _collection.InsertOneAsync(eventEntries[0]).ConfigureAwait(false);
+                await _collection.InsertOneAsync(eventEntries[0].AsBsonDocument()).ConfigureAwait(false);
             }
             else if (eventEntries.Count > 1)
             {
-                await _collection.InsertManyAsync(eventEntries).ConfigureAwait(false);
+                await _collection.InsertManyAsync(eventEntries.AsBsonDocuments()).ConfigureAwait(false);
             }
 
             return eventEntries.Count;
